@@ -1,6 +1,5 @@
 using System.Collections;
 using Mirror;
-using TMPro;
 using UnityEngine;
 
 public class squidypalPlayerController : MonoBehaviour
