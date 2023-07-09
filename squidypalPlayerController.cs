@@ -18,6 +18,7 @@ public class squidypalPlayerController : MonoBehaviour
     private CapsuleCollider capCollider;
     private GameObject instantiatedObject;
     private bool cooldown; 
+    private Vector3 direction;
 
     private void Start()
     {
@@ -31,17 +32,17 @@ public class squidypalPlayerController : MonoBehaviour
         float moveVertical = Input.GetAxis("Vertical");
 
         // Calculate the direction of movement relative to the camera's rotation
-        Vector3 direction = new Vector3(moveHorizontal, 0, moveVertical);
+        direction = new Vector3(moveHorizontal, 0, moveVertical);
         direction = playerCamera.transform.rotation * direction;
         direction.y = 0;
 
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            direction *= sprintSpeed * Time.deltaTime;
+            direction *= sprintSpeed;
         }
         else
         {
-            direction *= speed * Time.deltaTime;
+            direction *= speed;
         }
 
         rb.MovePosition(transform.position + direction);
@@ -60,13 +61,16 @@ public class squidypalPlayerController : MonoBehaviour
         transform.Rotate(0, rotationY, 0);
     }
     private void FixedUpdate()
+{
+    // Apply the movement direction and speed, with respect to time, to ensure frame rate independent movement
+    rb.MovePosition(transform.position + direction * Time.deltaTime);
+
+    if (isJumping)
     {
-        if (isJumping)
-        {
-            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
-            isJumping = false;
-        }
+        rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
+        isJumping = false;
     }
+}
     private bool IsGrounded()
     {
         return Physics.Raycast(transform.position, Vector3.down, capCollider.bounds.extents.y + 0.1f);
