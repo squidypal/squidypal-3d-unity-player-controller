@@ -15,6 +15,8 @@ public class squidypalPlayerController : MonoBehaviour
 
     private void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         rb = GetComponent<Rigidbody>();
         capCollider = GetComponent<CapsuleCollider>();
     }
