@@ -12,9 +12,6 @@ public class squidypalPlayerController : MonoBehaviour
     private Rigidbody rb;
     private bool isJumping = false;
     private CapsuleCollider capCollider;
-    public float delay = 30f;
-    public float timeLeft;
-    public TextMeshProUGUI countdownText;
 
     private void Start()
     {
@@ -24,15 +21,6 @@ public class squidypalPlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (timeLeft > 0)
-        {
-            countdownText.text = "Cooldown... " + Mathf.Round(timeLeft);
-        }
-        else
-        {
-            countdownText.text = "Ready to use";
-        }
-
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
 
