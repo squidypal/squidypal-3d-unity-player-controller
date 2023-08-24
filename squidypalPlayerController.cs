@@ -29,8 +29,8 @@ public class squidypalPlayerController : MonoBehaviour
         Vector3 cameraForward = playerCamera.transform.forward;
         Vector3 cameraRight = playerCamera.transform.right;
 
-        cameraForward.y = 0; // ignore vertical direction of the camera for movement
-        cameraRight.y = 0; 
+        cameraForward.y = 0;
+        cameraRight.y = 0;
 
         cameraForward.Normalize();
         cameraRight.Normalize();
@@ -54,7 +54,19 @@ public class squidypalPlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.MovePosition(transform.position + direction * Time.deltaTime);
+        if (rb.isKinematic)
+        {
+            // Check if there are any obstacles in the movement direction.
+            RaycastHit hitInfo;
+            if (!rb.SweepTest(direction.normalized, out hitInfo, direction.magnitude * Time.deltaTime))
+            {
+                transform.position += direction * Time.deltaTime;
+            }
+        }
+        else
+        {
+            rb.MovePosition(transform.position + direction * Time.deltaTime);
+        }
 
         if (isJumping)
         {
