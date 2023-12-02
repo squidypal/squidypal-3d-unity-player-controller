@@ -18,6 +18,8 @@ public class squidypalPlayerController : MonoBehaviour
     private CapsuleCollider capCollider;
     private float originalHeight;
 
+
+
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -71,6 +73,19 @@ public class squidypalPlayerController : MonoBehaviour
     {
         // Apply horizontal movement based on velocity, respecting physics
         rb.velocity = new Vector3(moveVelocity.x, rb.velocity.y, moveVelocity.z);
+        if (rb.isKinematic)
+        {
+            // Check if there are any obstacles in the movement direction.
+            RaycastHit hitInfo;
+            if (!rb.SweepTest(direction.normalized, out hitInfo, direction.magnitude * Time.deltaTime))
+            {
+                transform.position += direction * Time.deltaTime;
+            }
+        }
+        else
+        {
+            rb.MovePosition(transform.position + direction * Time.deltaTime);
+        }
 
         if (isJumping)
         {

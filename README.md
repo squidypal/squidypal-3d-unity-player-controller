@@ -1,7 +1,7 @@
-# squidypal-s-3d-unity-player-controller
+# squidypal's 3d unity player controller
 Simple 3d unity rigidbody based player controller
 
-Most of the values you should be able to fire out 
+Most of the values you should be able to figure out 
 Adjust to your liking 
 
 ## Features
