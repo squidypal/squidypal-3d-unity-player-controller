@@ -7,56 +7,61 @@ public class squidypalPlayerController : MonoBehaviour
     public float speed = 5f;
     public float sprintSpeed = 8f;
     public float jumpForce = 5f;
+    public float slideForce = 10f;
+    public float crouchHeight = 0.5f;
     public Camera playerCamera;
-    private Vector3 direction;
+    private Vector3 moveInput;
+    private Vector3 moveVelocity;
     private Rigidbody rb;
     private bool isJumping = false;
+    private bool isCrouching = false;
     private CapsuleCollider capCollider;
-    public float delay = 30f;
-    public float timeLeft;
-    public TextMeshProUGUI countdownText;
+    private float originalHeight;
 
     private void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         rb = GetComponent<Rigidbody>();
         capCollider = GetComponent<CapsuleCollider>();
+        originalHeight = capCollider.height;
     }
 
     private void Update()
     {
-        if (timeLeft > 0)
-        {
-            countdownText.text = "Cooldown... " + Mathf.Round(timeLeft);
-        }
-        else
-        {
-            countdownText.text = "Ready to use";
-        }
-
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
 
         Vector3 cameraForward = playerCamera.transform.forward;
         Vector3 cameraRight = playerCamera.transform.right;
 
-        cameraForward.y = 0; // ignore vertical direction of the camera for movement
-        cameraRight.y = 0; 
+        cameraForward.y = 0;
+        cameraRight.y = 0;
 
         cameraForward.Normalize();
         cameraRight.Normalize();
 
-        direction = cameraForward * moveVertical + cameraRight * moveHorizontal;
+        moveInput = cameraForward * moveVertical + cameraRight * moveHorizontal;
 
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            direction *= sprintSpeed;
+            moveVelocity = moveInput * sprintSpeed;
+            if (Input.GetKeyDown(KeyCode.C) && IsGrounded())
+            {
+                StartSlide();
+            }
         }
         else
         {
-            direction *= speed;
+            moveVelocity = moveInput * speed;
         }
 
-        if (IsGrounded() && Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            ToggleCrouch();
+        }
+
+        if (IsGrounded() && Input.GetKeyDown(KeyCode.Space) && !isCrouching)
         {
             isJumping = true;
         }
@@ -64,13 +69,26 @@ public class squidypalPlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.MovePosition(transform.position + direction * Time.deltaTime);
+        // Apply horizontal movement based on velocity, respecting physics
+        rb.velocity = new Vector3(moveVelocity.x, rb.velocity.y, moveVelocity.z);
 
         if (isJumping)
         {
-            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isJumping = false;
         }
+    }
+
+    private void ToggleCrouch()
+    {
+        isCrouching = !isCrouching;
+        capCollider.height = isCrouching ? crouchHeight : originalHeight;
+    }
+
+    private void StartSlide()
+    {
+        // Apply an initial slide force in the direction of movement
+        rb.AddForce(new Vector3(moveVelocity.x, 0, moveVelocity.z) * slideForce, ForceMode.VelocityChange);
     }
 
     private bool IsGrounded()
