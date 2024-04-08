@@ -6,8 +6,8 @@ Adjust to your liking
 
 ## Features
 
-- Physics based movement
-- Physics based object picking up
+- Rigidbody based movement
+- Rigidbody based object picking up
 - Velocity based fov on camera
 - Momentum based movement
 - Sliding
